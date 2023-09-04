@@ -1,21 +1,34 @@
 #!/usr/bin/env node
 import { getArgs } from './helpers/args.js'
-import { printHelp } from './services/log.service.js';
-import { saveKeyValue } from './services/storage.service.js';
+import { getWeather } from './services/api.service.js';
+import { printHelp, printSuccess, printError } from './services/log.service.js';
+import { saveKeyValue, TOKEN_DICTIONARY } from './services/storage.service.js';
 
-const initCLI=()=>{
-  const args=getArgs(process.argv)
-  console.log(args);
-  if(args.h){
+const saveToken = async (token) => {
+  if (!token.length) {
+    printError('No token')
+    return
+  }
+  try {
+    await saveKeyValue(TOKEN_DICTIONARY.token, token)
+    printSuccess('token is saved')
+  } catch (e) {
+    printError(e.message)
+  }
+}
+
+const initCLI = () => {
+  const args = getArgs(process.argv)
+  if (args.h) {
     printHelp()
   }
-  if(args.s){
-    //city
+  if (args.s) {
   }
-  if(args.t){
-    saveKeyValue('token', args.t)
+  if (args.t) {
+    return saveToken(args.t)
   }
-  //weather3
 };
+
+getWeather('moscow')
 
 initCLI()
